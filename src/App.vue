@@ -2,25 +2,21 @@
   <Scores ref="score" />
   <button @click="startGame">Start game</button>
   <button @click="resetGame">Reset</button>
- 
+  <FlagCanvas />
 </template>
 
 <script>
 import { io } from "socket.io-client";
 import Scores from './components/Scores.vue'
+import FlagCanvas from '../src/components/FlagCanva.vue';
 
 export default {
   components: {
-    Scores
+    Scores,
+    FlagCanvas
   },
   data() {
     return {
-      stageSize: {
-        width: window.innerWidth,
-        height: window.innerHeight
-      },
-      isDragging: false,
-      image: null,
       socket: null
     };
   },
@@ -57,4 +53,5 @@ export default {
     });
   }
 };
+
 </script>
