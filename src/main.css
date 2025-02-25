@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+@theme {
+  --font-k2d: K2D, serif;
+  --font-poppins: Poppins, sans-serif;
+  
+  --shadow-uniform: 0 0 8px 1px rgba(0, 0, 0, 1); 
+  --shadow-uniform-sm: 0 0 4px 1px rgba(0, 0, 0, 1); 
+  --shadow-uniform-md: 0 0 12px 1px rgba(0, 0, 0, 1); 
+  --shadow-uniform-lg: 0 0 16px 1px rgba(0, 0, 0, 1); 
+}

@@ -1,8 +1,12 @@
 <template>
   <Scores ref="score" />
-  <button @click="startGame">Start game</button>
-  <button @click="resetGame">Reset</button>
-  <FlagCanvas />
+  <div class="flex justify-center space-x-4">
+    <button class="bg-gradient-to-tr from-blue-700 to-blue-400 rounded-md text-white cursor-pointer px-10 py-1" @click="startGame">Start</button>
+    <button class="bg-gradient-to-tr from-red-700 to-red-400 rounded-md text-white cursor-pointer px-10 py-1" @click="resetGame">Reset</button>
+  </div>
+  <div class="w-full flex justify-center items-center my-10">
+    <FlagCanvas />
+  </div>
 </template>
 
 <script>
