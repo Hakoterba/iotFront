@@ -123,11 +123,18 @@
   
   function drawImages(): void {
     if (!ctx1 || !ctx2) return;
-  
+
     ctx1.clearRect(0, 0, canvas1Ref.value!.width, canvas1Ref.value!.height);
     ctx2.clearRect(0, 0, canvas2Ref.value!.width, canvas2Ref.value!.height);
-  
-    state.imagePositions.forEach((imageObj) => {
+
+    const backgroundImage = state.imagePositions.find(img => img.canvas === 'canvas1' && img.width === 1280);
+    const otherImages = state.imagePositions.filter(img => img !== backgroundImage);
+
+    if (backgroundImage) {
+      ctx1?.drawImage(backgroundImage.image, backgroundImage.x, backgroundImage.y, backgroundImage.width, backgroundImage.height);
+    }
+
+    otherImages.forEach((imageObj) => {
       const ctx = imageObj.canvas === 'canvas1' ? ctx1 : ctx2;
       ctx?.drawImage(imageObj.image, imageObj.x, imageObj.y, imageObj.width, imageObj.height);
     });
