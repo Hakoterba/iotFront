@@ -34,28 +34,60 @@ socket.on("state", (data) => {
 </script>
 
 <template>
-  <div>
-    <h1>Lasergame</h1>
+  <Scores ref="score" />
     <button @click="startGame">Start game</button>
     <button @click="resetGame">Reset</button>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <Scores ref="score"/>
+  <v-stage ref="stage" :config="stageSize">
+    <v-layer ref="layer">
+      <v-image
+        @dragstart="handleDragStart"
+        @dragend="handleDragEnd"
+        :config="{
+          image: image,
+          x: 50,
+          y: 50,
+          draggable: true,
+          width: 150,
+          height: 150
+        }"
+      />
+    </v-layer>
+  </v-stage>
 </template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
+<script>
+import { ref, onMounted } from "vue";
+
+export default {
+  data() {
+    return {
+      stageSize: {
+        width: window.innerWidth,
+        height: window.innerHeight
+      },
+      isDragging: false,
+      image: null
+    };
+  },
+  methods: {
+    handleDragStart() {
+      this.isDragging = true;
+    },
+    handleDragEnd(e) {
+      this.isDragging = false;
+      // Optionnel: tu peux récupérer les nouvelles coordonnées
+      console.log('Position après déplacement:', e.target.x(), e.target.y());
+    },
+    loadImage() {
+      const img = new Image();
+      img.src = "https://via.placeholder.com/150"; // Remplace par ton URL d'image
+      img.onload = () => {
+        this.image = img;
+      };
+    }
+  },
+  mounted() {
+    this.loadImage();
+  }
+};
+</script>
