@@ -5,7 +5,7 @@
     <button class="bg-gradient-to-tr from-red-700 to-red-400 rounded-md text-white cursor-pointer px-10 py-1" @click="resetGame">Reset</button>
   </div>
   <div class="w-full flex justify-center items-center my-10">
-    <FlagCanvas />
+    <FlagCanvas ref="flagCanvas"/>
   </div>
 </template>
 
@@ -47,12 +47,12 @@ export default {
     });
 
     this.socket.on("flags", (data) => {
+        this.$refs.flagCanvas.setFlags(JSON.parse(data));
         console.log('Flags:', data);
     });
 
     this.socket.on("state", (data) => {
-      console.log('State:', this.$refs.score);
-      
+        this.$refs.flagCanvas.updateFlagsColor(JSON.parse(data).flags);
         this.$refs.score.updateValue(JSON.parse(data))
     });
   }
