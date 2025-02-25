@@ -27,6 +27,8 @@ export default {
             this.interval = null;
         },
         updateValue(newValues){
+            console.log(newValues);
+            
             this.trueScores.redScore = newValues.score_red;
             this.trueScores.blueScore = newValues.score_blue;
             this.redScore = (newValues.score_red / 300) * 100;
