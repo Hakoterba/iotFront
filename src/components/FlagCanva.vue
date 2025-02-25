@@ -9,7 +9,7 @@
 </template>
   
   <script setup lang="ts">
-  import { onMounted, ref, reactive } from 'vue';
+  import { onMounted, ref, reactive, watch } from 'vue';
   
   const canvas1Ref = ref<HTMLCanvasElement | null>(null);
   const canvas2Ref = ref<HTMLCanvasElement | null>(null);
@@ -24,17 +24,19 @@
     imagePositions: [] as { image: HTMLImageElement, x: number, y: number, canvas: string }[],
   });
   
-  const flagsData = [
-    { id: "567d5781-e49a-4ba1-867c-b53632fe2b7f", socket: "E1DSjMDuE6AXjMRWAAAQ", color: "red" },
-    { id: "098d62b8-c68e-4cce-821a-cae81bde0a90", socket: "yBmcFQXN6XMqHaZuAAAS", color: "white" }
-  ];
+  const flagsData = ref<any[]>([]);
+  function setFlags(flags: any) {
+    flagsData.value = flags;
+  }
+
+  defineExpose({ setFlags, updateFlagsColor });
   
   const flagImg = new Image();
   flagImg.src = './src/assets/flag.png';
   
   flagImg.onload = () => {
     let xPos = 50;
-    flagsData.forEach(() => {
+    flagsData.value.forEach(() => {
       state.imagePositions.push({
         image: flagImg,
         x: xPos,
@@ -45,6 +47,66 @@
     });
     drawImages();
   };
+
+  watch(flagsData, (newFlags, oldFlags) => {
+      const newIds = new Set(newFlags.map(flag => flag.id));
+
+      state.imagePositions = state.imagePositions.filter(pos => newIds.has(pos.image.dataset.id));
+
+      newFlags.forEach(flag => {
+          const alreadyExists = state.imagePositions.some(pos => pos.image.dataset.id === flag.id);
+          if (!alreadyExists) {
+              const newImage = new Image();
+              newImage.src = flagImg.src;
+              newImage.dataset.id = flag.id;
+
+              state.imagePositions.push({
+                  image: newImage,
+                  x: 50 + state.imagePositions.length * 90,
+                  y: 50,
+                  canvas: 'canvas2'
+              });
+          }
+      });
+
+      drawImages();
+  }, { deep: true });
+
+  function updateFlagsColor(flags: any) {
+  state.imagePositions.forEach((imageObj) => {
+    // Chercher le drapeau correspondant dans le tableau flags
+    const flag = flags.find(flag => flag.id === imageObj.image.dataset.id);
+    if (flag) {
+      console.log(flag);
+      
+      const color = flag.color;
+      if (color === "white") return; // Si la couleur est blanche, ne rien faire
+
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // Définir les dimensions du canvas
+      canvas.width = 150;
+      canvas.height = 150;
+
+      // Appliquer la couleur
+      ctx.fillStyle = color;
+      ctx.fillRect(0, 0, 150, 150); // Appliquer la couleur en tant que fond
+
+      // Mélanger la couleur avec l'image existante
+      ctx.globalCompositeOperation = 'destination-atop';
+      ctx.drawImage(imageObj.image, 0, 0, 150, 150); // Dessiner l'image par-dessus la couleur
+
+      // Mettre à jour l'image avec la couleur appliquée
+      imageObj.image.src = canvas.toDataURL();
+    }
+  });
+  drawImages();
+}
+
+
+
   
   function drawImages(): void {
     if (!ctx1 || !ctx2) return;

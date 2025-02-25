@@ -2,7 +2,7 @@
   <Scores ref="score" />
   <button @click="startGame">Start game</button>
   <button @click="resetGame">Reset</button>
-  <FlagCanvas />
+  <FlagCanvas ref="flagCanvas"/>
 </template>
 
 <script>
@@ -43,12 +43,12 @@ export default {
     });
 
     this.socket.on("flags", (data) => {
+        this.$refs.flagCanvas.setFlags(JSON.parse(data));
         console.log('Flags:', data);
     });
 
     this.socket.on("state", (data) => {
-      console.log('State:', this.$refs.score);
-      
+        this.$refs.flagCanvas.updateFlagsColor(JSON.parse(data).flags);
         this.$refs.score.updateValue(JSON.parse(data))
     });
   }
