@@ -10,8 +10,7 @@
 </template>
 
 <script>
-import { io } from "socket.io-client";
-import Scores from './components/Scores.vue'
+import Scores from './components/Scores.vue';
 import FlagCanvas from '../src/components/FlagCanva.vue';
 
 export default {
@@ -26,36 +25,54 @@ export default {
   },
   methods: {
     startGame() {
-        this.socket.emit('start_game');
+      this.sendMessage({ id: 'start_game' });
     },
     resetGame() {
-        this.socket.emit('reset_game');
+      this.sendMessage({ id: 'reset_game' });
+    },
+    sendMessage(data) {
+      if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+        this.socket.send(JSON.stringify(data));
+      } else {
+        console.error('WebSocket non connecté');
+      }
     }
   },
   mounted() {
     console.log('Connexion au serveur WebSocket');
+    this.socket = new WebSocket('ws://lasergameserver.hugotran.fr:3001');
     
-    this.socket = io('http://lasergameserver.hugotran.fr:3001');
-
-    this.socket.on('connect', () => {
-                console.log('Connecté au serveur WebSocket');
-                this.socket.emit('client_data', {id: 'client'});
-            });
-
-    this.socket.on('message', (data) => {
-        console.log('Message du serveur:', data);
-    });
-
-    this.socket.on("flags", (data) => {
-        this.$refs.flagCanvas.setFlags(JSON.parse(data));
-        console.log('Flags:', data);
-    });
-
-    this.socket.on("state", (data) => {
-        this.$refs.flagCanvas.updateFlagsColor(JSON.parse(data).flags);
-        this.$refs.score.updateValue(JSON.parse(data))
-    });
+    this.socket.onopen = () => {
+      console.log('Connecté au serveur WebSocket');
+      this.sendMessage({ id: 'client' });
+    };
+    
+    this.socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log('Message du serveur:', data);
+      
+      switch (data.event) {
+        case 'message':
+          console.log('Serveur:', data.data);
+          if (data.data.includes('Game over!')) {
+            setTimeout(() => {
+              alert(data.data);
+            }, 2000);
+          }
+          break;
+        case 'flags':
+          this.$refs.flagCanvas.setFlags(data.data);
+          break;
+        case 'state':
+          this.$refs.flagCanvas.updateFlagsColor(data.data.flags);
+          this.$refs.score.updateValue(data.data);
+          break;
+      }
+    };
+    
+    this.socket.onclose = () => {
+      console.log('Déconnecté du serveur WebSocket');
+    };
   }
 };
-
 </script>
