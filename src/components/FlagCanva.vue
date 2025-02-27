@@ -81,7 +81,19 @@
               });
           }
       });
-
+      const savedImage = localStorage.getItem('uploadedImage');
+      if (savedImage) {
+        const img = new Image();
+        img.src = savedImage as string;
+        state.imagePositions.push({
+          image: img,
+          x: 0,
+          y: 0,
+          width: 1280,
+          height: 600,
+          canvas: 'canvas1',
+        });
+      }
       drawImages();
   }, { deep: true });
 
@@ -197,6 +209,10 @@ onMounted(() => {
 
   addEventListeners(canvas1Ref.value, 'canvas2');
   addEventListeners(canvas2Ref.value, 'canvas1');
+
+  setInterval(() => {
+    drawImages();
+  }, 1000 / 60);
 });
 
 function on_upload(e: Event) {
@@ -205,13 +221,16 @@ function on_upload(e: Event) {
 
   const reader = new FileReader();
   reader.onload = (e) => {
+    const result = e.target?.result as string;
+    localStorage.setItem('uploadedImage', result);
+    
     const img = new Image();
     img.src = e.target?.result as string;
     img.onload = () => {
       state.imagePositions.push({
         image: img,
-        x: 50,
-        y: 50,
+        x: 0,
+        y: 0,
         width: 1280,
         height: 600,
         canvas: 'canvas1'
