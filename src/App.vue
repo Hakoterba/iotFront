@@ -7,11 +7,24 @@
   <div class="w-full flex justify-center items-center my-10">
     <FlagCanvas ref="flagCanvas"/>
   </div>
+
+  <transition
+    enter-active-class="transition-opacity duration-500"
+    leave-active-class="transition-opacity duration-500"
+    enter-from-class="opacity-0"
+    leave-to-class="opacity-0"
+  >
+    <div v-if="gameOverMessage" :class="['fixed top-5 left-1/2 transform -translate-x-1/2 px-6 py-3 text-white rounded-lg shadow-lg flex items-center space-x-3', gameOverColor]">
+      <span class="font-semibold">{{ gameOverMessage }}</span>
+      <button @click="closeAlert" class="text-white hover:text-gray-300">X</button>
+    </div>
+  </transition>   
 </template>
 
 <script>
 import Scores from './components/Scores.vue';
 import FlagCanvas from '../src/components/FlagCanva.vue';
+import { confetti } from "@tsparticles/confetti";
 
 export default {
   components: {
@@ -20,7 +33,9 @@ export default {
   },
   data() {
     return {
-      socket: null
+      socket: null,
+      gameOverMessage: "",
+      gameOverColor: "bg-gray-700"
     };
   },
   methods: {
@@ -36,6 +51,16 @@ export default {
       } else {
         console.error('WebSocket non connecté');
       }
+    },
+    closeAlert() {
+      this.gameOverMessage = "";
+    },
+    launchConfetti() {
+      confetti({
+        spread: 70,
+        particleCount: 100,
+        origin: { y: 0 }
+      });
     }
   },
   mounted() {
@@ -56,7 +81,14 @@ export default {
           console.log('Serveur:', data.data);
           if (data.data.includes('Game over!')) {
             setTimeout(() => {
-              alert(data.data);
+              this.gameOverMessage = data.data;
+              this.launchConfetti();
+
+              if (data.data.includes("red")) {
+                this.gameOverColor = "bg-red-600";
+              } else if (data.data.includes("blue")) {
+                this.gameOverColor = "bg-blue-600";
+              }
             }, 2000);
           }
           break;
