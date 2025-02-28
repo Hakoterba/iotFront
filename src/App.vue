@@ -14,9 +14,9 @@
     enter-from-class="opacity-0"
     leave-to-class="opacity-0"
   >
-    <div v-if="gameOver" :class="['z-101 fixed top-5 left-1/2 transform -translate-x-1/2 px-6 py-3 text-white rounded-lg shadow-lg flex items-center space-x-3 cursor-pointer', gameOverColor]">
+    <div v-if="gameOver" :class="['z-101 fixed top-5 left-1/2 transform -translate-x-1/2 px-6 py-3 text-white rounded-lg shadow-lg flex items-center space-x-3', gameOverColor]">
       <span class="font-semibold">{{ gameOverMessage }}</span>
-      <button @click="closeAlert" class="text-white hover:text-gray-300">X</button>
+      <button @click="closeAlert" class="text-white hover:text-gray-300 cursor-pointer">X</button>
     </div>
   </transition>   
 </template>
