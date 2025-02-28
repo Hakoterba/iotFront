@@ -1,8 +1,8 @@
 <template>
   <Scores ref="score" />
   <div class="flex justify-center space-x-4">
-    <button class="bg-gradient-to-tr from-blue-700 to-blue-400 rounded-md text-white cursor-pointer px-10 py-1" @click="startGame">Start</button>
-    <button class="bg-gradient-to-tr from-red-700 to-red-400 rounded-md text-white cursor-pointer px-10 py-1" @click="resetGame">Reset</button>
+    <button class="bg-gradient-to-tr from-blue-700 to-blue-400 rounded-md text-white cursor-pointer px-10 py-1 z-101" @click="startGame">Start</button>
+    <button class="bg-gradient-to-tr from-red-700 to-red-400 rounded-md text-white cursor-pointer px-10 py-1 z-101" @click="resetGame">Reset</button>
   </div>
   <div class="w-full flex justify-center items-center my-10">
     <FlagCanvas ref="flagCanvas"/>
@@ -14,7 +14,7 @@
     enter-from-class="opacity-0"
     leave-to-class="opacity-0"
   >
-    <div v-if="gameOverMessage" :class="['fixed top-5 left-1/2 transform -translate-x-1/2 px-6 py-3 text-white rounded-lg shadow-lg flex items-center space-x-3', gameOverColor]">
+    <div v-if="gameOver" :class="['z-101 fixed top-5 left-1/2 transform -translate-x-1/2 px-6 py-3 text-white rounded-lg shadow-lg flex items-center space-x-3 cursor-pointer', gameOverColor]">
       <span class="font-semibold">{{ gameOverMessage }}</span>
       <button @click="closeAlert" class="text-white hover:text-gray-300">X</button>
     </div>
@@ -34,6 +34,7 @@ export default {
   data() {
     return {
       socket: null,
+      gameOver: false,
       gameOverMessage: "",
       gameOverColor: "bg-gray-700"
     };
@@ -53,7 +54,7 @@ export default {
       }
     },
     closeAlert() {
-      this.gameOverMessage = "";
+      this.gameOver = false;
     },
     launchConfetti() {
       confetti({
@@ -89,6 +90,7 @@ export default {
               } else if (data.data.includes("blue")) {
                 this.gameOverColor = "bg-blue-600";
               }
+              this.gameOver = true;
             }, 2000);
           }
           break;
